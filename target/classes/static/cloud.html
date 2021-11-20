@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Nubes/ Clouds</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="/js/cloud.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+              integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            <nav class="navbar navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <span class="navbar-brand mb-0 h1">NUBES- NUBES PRO</span>
+                    <button onClick="logout()" class="btn btn-light">Logout</button>
+                </div>
+            </nav>
+
+            <div class="pt-2">
+                <figure class="text-center">
+                    <blockquote class="blockquote">
+                        <p>Nubes/ Clouds</p>
+                    </blockquote>
+                </figure>
+            </div>
+            <div class="pt-3 row">
+                <div class="col 3">
+                    <div class="card text-white bg-primary mb-3">
+                        <div class="container unauthenticated">
+                            <div class="card-header" >Autenticación con Github</div>
+                            Recuerde que para acceder a la página debe iniciar sesión con Github, para ello haga click en el link:
+                            <a href="/oauth2/authorization/github" class="btn btn-primary">haz click</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+
+        <div class="container authenticated" style="display:none">
+            Hola <span id="user"></span>, aquí puedes visualizar, crear, actualizar y/o eliminar una nube.
+
+            <div id="info" style="display: none;">
+                <table class="table table-hover">
+                    <thead>
+                    <th>Nombre / Name</th> 
+                    <th>Marca / Brand</th>
+                    <th>Año / Year</th>
+                    <th>Descripción / Description</th>
+                    <th>Categoria / Category</th>
+                    <th colspan="2">Actions / Acciones</th>
+                    </thead>
+                    <tbody id="allItems"></tbody>
+                </table>
+            </div>
+
+            <div id="formPost" style="display: none;">
+                <figure id="crearnube" class="text-center" >
+                    <blockquote class="blockquote">
+                        <p>Crear Cloud</p>
+                    </blockquote>
+                </figure>
+                
+                 <figure id="actualizarnube" class="text-center" style="display: none;" > 
+                    <blockquote class="blockquote">
+                        <p>Actualizar Cloud</p>
+                    </blockquote>
+                </figure>
+   
+                <form action="" method="post" class="row">
+                    <div class="col-4 pt-4 pb-4">
+                        <label for="brand">Marca / Brand</label>
+                        <input class="form-control" type="text" name="brand" maxlength="45" id="brand"
+                               placeholder="Brand " aria-label="Brand" required>
+                    </div>
+
+                    <div class="col-4 pt-4 pb-4">
+                        <label for="NameCloud">Nombre del Nube / Clouds's name</label>
+                        <input class="form-control" type="text" name="nameCloud" maxlength="45" id="nameCloud"
+                               placeholder="Name Cloud " aria-label="NameCloud" required>
+                    </div>
+
+                    <div class="col-4 pt-4 pb-4">
+                        <label for="year">Año / Year</label>
+                        <input class="form-control" type="number" name="year" min="1000" max="9999" id="year"
+                               placeholder="Select the Year" aria-label="Year" required>
+                    </div>
+
+                    <div class="col-6 pt-4 pb-4">
+                        <label for="description">Descripción de la Nube / Cloud's Description</label>
+                        <input class="form-control" type="text" name="description" maxlength="250" id="descriptionCloud"
+                               placeholder="Description Cloud " aria-label="DescriptionCloud" required>
+                    </div>
+                    <div id="categorydata" class="col-4 pt-4 pb-4">
+                        <label for="categoryname">Nombre de la Categoría / Category's name</label>
+                        <select class="form-control" name="category" id="categoryname" required>
+                        </select>  
+                    </div> 
+                </form>
+                <center> 
+                    <button class="btn btn-success" type="button" onclick="postCloud()" id="btnGuardarNube" style="display: none;">Guardar Nube</button>
+                    <button class="btn btn-danger" type="button" onclick="cancelar()" id="btnCancelar" style="display: none;">Cancelar Cambios</button>
+                    <button class="btn btn-info" type="button" onclick="putCloud()" id="btnEditar" style="display: none;">Editar Nube</button>
+                    <input type="text" name="idCloud" id="idCloud" hidden>
+                </center> 
+                <hr>
+                <div>
+                    <a href="cloud.html" class="btn btn-link">Volver a la página anterior</a>
+                    <a href="index.html" class="btn btn-link">Volver al inicio</a>
+                </div>
+                <hr>
+
+            </div>
+            <div class="row">
+                <button class="btn btn-primary" type="button" onclick="showForm()" id="btncrearNube">Crear nueva Nube</button>
+            </div>
+
+        </div>
+    </body>
+    <script type="text/javascript">
+        $.get("/user", function (data) {
+            console.log("get");
+            console.log(data);
+            $("#user").html(data.name);
+            $(".unauthenticated").hide();
+            $(".authenticated").show();
+
+        });
+
+
+        var logout = function () {
+            $.post("/logout", function () {
+                $("#user").html('');
+                $(".unauthenticated").show();
+                $(".authenticated").hide();
+            })
+            return true;
+        }
+    </script>
+</html>
